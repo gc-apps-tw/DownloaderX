@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DownloaderX</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        
+        :root { --blue-glow: rgba(59, 130, 246, 0.5); }
+        
+        body {
+            background: #030712;
+            background-image: radial-gradient(circle at 50% -20%, #1e293b 0%, #030712 100%);
+            color: #f3f4f6;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 標題適配：防止換行破碎 */
+        .hero-title {
+            font-size: clamp(1.5rem, 8vw, 2.5rem);
+            font-weight: 900;
+            letter-spacing: -0.05em;
+            color: #ffffff; /* 直接給純白色 */
+            text-align: center;
+            width: 100%;
+            text-shadow: 0 2px 10px rgba(255, 255, 255, 0.1); /* 加一點點微弱的呼吸感 */
+}
+
+        /* 玻璃擬態卡片：強化層次感 */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 2rem;
+            width: 100%;
+            max-width: 32rem; /* 512px */
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* 輸入框組合：固定高度避免變形 */
+        .input-container {
+            position: relative;
+            height: 64px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.25rem;
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .input-container:focus-within {
+            border-color: #3b82f6;
+            box-shadow: 0 0 20px var(--blue-glow);
+        }
+
+        .input-field {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: white;
+            padding: 0 16px;
+            font-size: 1rem;
+            width: 100%;
+        }
+
+        .btn-submit {
+            width: 48px;
+            height: 48px;
+            background: #3b82f6;
+            border-radius: 0.875rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: all 0.2s;
+        }
+        .btn-submit:active { transform: scale(0.95); }
+
+        /* 結果預覽圖：固定比例 */
+        .media-preview {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            border-radius: 1.25rem;
+            overflow: hidden;
+            position: relative;
+        }
+        .media-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 底部導覽：自定義間距 */
+        .tab-btn {
+            flex: 1;
+            padding: 10px 0;
+            font-size: 0.875rem;
+            font-weight: 700;
+            border-radius: 0.75rem;
+            color: #94a3b8;
+            transition: all 0.3s;
+        }
+        .tab-btn.active {
+            background: #3b82f6;
+            color: white;
+        }
+
+        /* 針對小螢幕微調 */
+        @media (max-width: 380px) {
+            .glass-panel { padding: 1.25rem !important; }
+            .hero-title { font-size: 1.25rem; }
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+
+    <header class="w-full max-w-2xl flex justify-between items-center mb-10">
+        <div class="flex items-center gap-2">
+            <div class="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center">
+                <i class="fas fa-bolt text-white text-lg"></i>
+            </div>
+            <span class="text-xl font-black tracking-tighter">DownloaderX</span>
+        </div>
+        <div class="text-[10px] text-slate-500 font-bold tracking-widest uppercase opacity-60">
+            Disclaimer / 免責聲明
+        </div>
+    </header>
+
+    <main class="w-full flex flex-col items-center gap-6">
+        
+        <div class="glass-panel p-6 sm:p-10 space-y-8">
+            <h1 class="hero-title">解析一切媒體資源</h1>
+            
+            <div class="input-container">
+                <input id="urlInput" type="text" placeholder="貼上連結..." class="input-field">
+                <button onclick="analyzeUrl()" class="btn-submit">
+                    <i id="btnIcon" class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+
+            <div class="flex justify-around items-center text-slate-500 text-xl px-4">
+                <i class="fab fa-youtube hover:text-red-500 transition-colors cursor-help"></i>
+                <i class="fab fa-instagram hover:text-pink-500 transition-colors"></i>
+                <i class="fab fa-tiktok hover:text-white transition-colors"></i>
+                <i class="fab fa-twitter hover:text-blue-400 transition-colors"></i>
+                <i class="fas fa-camera-retro hover:text-orange-400 transition-colors"></i>
+            </div>
+        </div>
+
+        <div id="loader" class="hidden flex flex-col items-center py-10">
+            <div class="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            <span class="text-blue-400 text-xs mt-4 font-bold tracking-tighter">解析中...</span>
+        </div>
+
+        <div id="resultSection" class="hidden glass-panel p-5 animate-in fade-in slide-in-from-bottom-4">
+            <div class="media-preview mb-5">
+                <img id="previewImg" src="">
+                <div id="playIcon" class="absolute inset-0 flex items-center justify-center bg-black/20">
+                    <div class="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center shadow-2xl">
+                        <i class="fas fa-play text-white ml-1"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-2 space-y-4">
+                <div class="flex justify-between items-start">
+                    <h2 id="resTitle" class="text-base font-bold line-clamp-2 flex-1 mr-4 leading-snug">載入中...</h2>
+                    <span id="platformTag" class="text-[9px] bg-blue-500/20 text-blue-400 border border-blue-500/30 px-2 py-0.5 rounded font-black uppercase">Auto</span>
+                </div>
+
+                <div class="flex bg-black/40 p-1 rounded-xl">
+                    <button onclick="switchTab('video')" id="tab-video" class="tab-btn active">影片</button>
+                    <button onclick="switchTab('image')" id="tab-image" class="tab-btn">圖片</button>
+                    <button onclick="switchTab('audio')" id="tab-audio" class="tab-btn">音訊</button>
+                </div>
+
+                <div id="optionsGrid" class="space-y-3 pt-2"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="mt-auto py-10 text-center space-y-1">
+        <p class="text-[10px] text-slate-700 font-black tracking-[0.4em] uppercase">© 2026 DOWNLOADERX • BY GC</p>
+        <p class="text-[8px] text-slate-800">Backend: oliver2013tw-dwnx-back</p>
+    </footer>
+
+    <script>
+        const API_URL = "https://oliver2013tw-dwnx-back.hf.space/api/analyze";
+        let resData = null;
+
+        async function analyzeUrl() {
+            const val = document.getElementById('urlInput').value.trim();
+            if(!val) return;
+
+            const loader = document.getElementById('loader');
+            const res = document.getElementById('resultSection');
+            const btnIcon = document.getElementById('btnIcon');
+
+            loader.classList.remove('hidden');
+            res.classList.add('hidden');
+            btnIcon.className = "fas fa-circle-notch animate-spin";
+
+            try {
+                const response = await fetch(`${API_URL}?url=${encodeURIComponent(val)}`);
+                const data = await response.json();
+
+                if(data.success) {
+                    resData = data;
+                    document.getElementById('previewImg').src = data.thumbnail || "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800";
+                    document.getElementById('resTitle').innerText = data.title;
+                    document.getElementById('platformTag').innerText = data.platform;
+                    document.getElementById('playIcon').style.display = data.url ? 'flex' : 'none';
+                    
+                    res.classList.remove('hidden');
+                    switchTab(data.images && data.images.length > 0 && !data.url ? 'image' : 'video');
+                } else {
+                    alert("解析失敗：" + data.error);
+                }
+            } catch(e) {
+                alert("伺服器連線失敗");
+            } finally {
+                loader.classList.add('hidden');
+                btnIcon.className = "fas fa-paper-plane";
+            }
+        }
+
+        async function forceDownload(url, filename) {
+            const btn = event.currentTarget;
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner animate-spin"></i>';
+            
+            try {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const blobUrl = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(blobUrl);
+            } catch(e) {
+                window.open(url, '_blank');
+            } finally {
+                btn.innerHTML = original;
+            }
+        }
+
+        function switchTab(type) {
+            ['video', 'image', 'audio'].forEach(t => {
+                document.getElementById(`tab-${t}`).className = t === type ? 'tab-btn active' : 'tab-btn';
+            });
+
+            const grid = document.getElementById('optionsGrid');
+            grid.innerHTML = '';
+
+            if(type === 'video' && resData.url) {
+                grid.innerHTML = createDownloadItem("下載最佳畫質影片", resData.url, "video.mp4", "fa-video");
+            } else if(type === 'image' && resData.images) {
+                const imgGrid = document.createElement('div');
+                imgGrid.className = "grid grid-cols-2 gap-2";
+                resData.images.forEach((img, i) => {
+                    imgGrid.innerHTML += `
+                        <div class="relative group aspect-square rounded-lg overflow-hidden border border-white/10">
+                            <img src="${img}" class="w-full h-full object-cover">
+                            <button onclick="forceDownload('${img}', 'img_${i}.jpg')" class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                <i class="fas fa-download text-white"></i>
+                            </button>
+                        </div>`;
+                });
+                grid.appendChild(imgGrid);
+            } else if(type === 'audio' && resData.url) {
+                grid.innerHTML = createDownloadItem("提取 MP3 音訊", resData.url, "audio.mp3", "fa-music");
+            }
+        }
+
+        function createDownloadItem(label, url, file, icon) {
+            return `
+                <div class="bg-white/5 p-4 rounded-xl flex justify-between items-center border border-white/5">
+                    <div class="flex items-center gap-3">
+                        <i class="fas ${icon} text-blue-400"></i>
+                        <span class="text-xs font-bold">${label}</span>
+                    </div>
+                    <button onclick="forceDownload('${url}', '${file}')" class="bg-blue-600 px-4 py-1.5 rounded-lg text-[10px] font-black uppercase">下載</button>
+                </div>`;
+        }
+    </script>
+</body>
+</html>
