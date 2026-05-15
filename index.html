@@ -3,299 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DownloaderX</title>
+    <title>DwnX | 極致解析</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        
-        :root { --blue-glow: rgba(59, 130, 246, 0.5); }
-        
+
         body {
-            background: #030712;
-            background-image: radial-gradient(circle at 50% -20%, #1e293b 0%, #030712 100%);
-            color: #f3f4f6;
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
+            background-color: #000;
+            color: #fff;
+            font-family: 'Inter', -apple-system, sans-serif;
             margin: 0;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
         }
 
-        /* 標題適配：防止換行破碎 */
+        /* 修正黃線：標題純白、強制一行、自動縮放 */
         .hero-title {
-            font-size: clamp(1.5rem, 8vw, 2.5rem);
+            font-size: clamp(1.2rem, 7.5vw, 2.5rem);
             font-weight: 900;
-            letter-spacing: -0.05em;
-            color: #ffffff; /* 直接給純白色 */
+            white-space: nowrap; 
             text-align: center;
-            width: 100%;
-            text-shadow: 0 2px 10px rgba(255, 255, 255, 0.1); /* 加一點點微弱的呼吸感 */
-}
-
-        /* 玻璃擬態卡片：強化層次感 */
-        .glass-panel {
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 2rem;
-            width: 100%;
-            max-width: 32rem; /* 512px */
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            margin: 50px 0;
+            letter-spacing: -1px;
+            text-transform: uppercase;
         }
 
-        /* 輸入框組合：固定高度避免變形 */
-        .input-container {
-            position: relative;
-            height: 64px;
-            background: rgba(0, 0, 0, 0.4);
+        /* 玻璃質感容器 */
+        .container-box {
+            width: 100%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 1.25rem;
-            display: flex;
-            align-items: center;
-            padding: 0 8px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .input-container:focus-within {
-            border-color: #3b82f6;
-            box-shadow: 0 0 20px var(--blue-glow);
+            border-radius: 24px;
+            padding: 24px;
         }
 
-        .input-field {
+        /* 修正物件大小與對齊 */
+        .search-bar {
+            display: flex;
+            height: 56px;
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 14px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar:focus-within {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+        }
+
+        input {
             flex: 1;
             background: transparent;
             border: none;
-            outline: none;
-            color: white;
+            color: #fff;
             padding: 0 16px;
-            font-size: 1rem;
-            width: 100%;
+            font-size: 16px;
+            outline: none;
         }
 
-        .btn-submit {
-            width: 48px;
-            height: 48px;
-            background: #3b82f6;
-            border-radius: 0.875rem;
+        .btn-send {
+            width: 56px;
+            background: #2563eb;
+            color: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            transition: all 0.2s;
+            border: none;
         }
-        .btn-submit:active { transform: scale(0.95); }
 
-        /* 結果預覽圖：固定比例 */
-        .media-preview {
+        /* 修正紅線：預覽圖區塊固定 16:9 */
+        .preview-card {
+            margin-top: 24px;
             width: 100%;
             aspect-ratio: 16 / 9;
-            background: #000;
-            border-radius: 1.25rem;
+            background: #0a0a0a;
+            border-radius: 12px;
             overflow: hidden;
+            border: 1px solid #222;
             position: relative;
         }
-        .media-preview img {
+
+        .preview-card img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            display: none;
         }
 
-        /* 底部導覽：自定義間距 */
-        .tab-btn {
-            flex: 1;
-            padding: 10px 0;
-            font-size: 0.875rem;
-            font-weight: 700;
-            border-radius: 0.75rem;
-            color: #94a3b8;
-            transition: all 0.3s;
-        }
-        .tab-btn.active {
-            background: #3b82f6;
-            color: white;
+        /* 下載按鈕 */
+        .btn-download {
+            width: 100%;
+            background: #fff;
+            color: #000;
+            padding: 16px;
+            border-radius: 14px;
+            font-weight: 800;
+            font-size: 14px;
+            margin-top: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
-        /* 針對小螢幕微調 */
-        @media (max-width: 380px) {
-            .glass-panel { padding: 1.25rem !important; }
-            .hero-title { font-size: 1.25rem; }
+        .loading-spin {
+            animation: spin 1s linear infinite;
         }
+
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .hidden { display: none; }
     </style>
 </head>
-<body class="p-4 sm:p-8">
+<body>
 
-    <header class="w-full max-w-2xl flex justify-between items-center mb-10">
-        <div class="flex items-center gap-2">
-            <div class="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center">
-                <i class="fas fa-bolt text-white text-lg"></i>
+    <h1 class="hero-title">解析一切媒體資源</h1>
+
+    <div class="container-box">
+        <div class="search-bar">
+            <input type="text" id="urlInput" placeholder="貼上 YouTube 連結..." spellcheck="false">
+            <button onclick="analyze()" class="btn-send">
+                <i id="btnIcon" class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+
+        <div id="resultArea" class="hidden">
+            <div class="preview-card">
+                <img id="thumb" src="" alt="Thumbnail" onload="this.style.display='block'">
             </div>
-            <span class="text-xl font-black tracking-tighter">DownloaderX</span>
-        </div>
-        <div class="text-[10px] text-slate-500 font-bold tracking-widest uppercase opacity-60">
-            Disclaimer / 免責聲明
-        </div>
-    </header>
-
-    <main class="w-full flex flex-col items-center gap-6">
-        
-        <div class="glass-panel p-6 sm:p-10 space-y-8">
-            <h1 class="hero-title">解析一切媒體資源</h1>
             
-            <div class="input-container">
-                <input id="urlInput" type="text" placeholder="貼上連結..." class="input-field">
-                <button onclick="analyzeUrl()" class="btn-submit">
-                    <i id="btnIcon" class="fas fa-paper-plane"></i>
-                </button>
-            </div>
-
-            <div class="flex justify-around items-center text-slate-500 text-xl px-4">
-                <i class="fab fa-youtube hover:text-red-500 transition-colors cursor-help"></i>
-                <i class="fab fa-instagram hover:text-pink-500 transition-colors"></i>
-                <i class="fab fa-tiktok hover:text-white transition-colors"></i>
-                <i class="fab fa-twitter hover:text-blue-400 transition-colors"></i>
-                <i class="fas fa-camera-retro hover:text-orange-400 transition-colors"></i>
-            </div>
-        </div>
-
-        <div id="loader" class="hidden flex flex-col items-center py-10">
-            <div class="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-            <span class="text-blue-400 text-xs mt-4 font-bold tracking-tighter">解析中...</span>
-        </div>
-
-        <div id="resultSection" class="hidden glass-panel p-5 animate-in fade-in slide-in-from-bottom-4">
-            <div class="media-preview mb-5">
-                <img id="previewImg" src="">
-                <div id="playIcon" class="absolute inset-0 flex items-center justify-center bg-black/20">
-                    <div class="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center shadow-2xl">
-                        <i class="fas fa-play text-white ml-1"></i>
-                    </div>
+            <div class="mt-4">
+                <p id="videoTitle" class="text-sm font-bold text-white/80 line-clamp-2"></p>
+                <div class="flex gap-2 mt-2">
+                    <span class="text-[10px] bg-white/10 px-2 py-1 rounded text-white/40 font-mono" id="platform">YOUTUBE</span>
                 </div>
             </div>
 
-            <div class="px-2 space-y-4">
-                <div class="flex justify-between items-start">
-                    <h2 id="resTitle" class="text-base font-bold line-clamp-2 flex-1 mr-4 leading-snug">載入中...</h2>
-                    <span id="platformTag" class="text-[9px] bg-blue-500/20 text-blue-400 border border-blue-500/30 px-2 py-0.5 rounded font-black uppercase">Auto</span>
-                </div>
-
-                <div class="flex bg-black/40 p-1 rounded-xl">
-                    <button onclick="switchTab('video')" id="tab-video" class="tab-btn active">影片</button>
-                    <button onclick="switchTab('image')" id="tab-image" class="tab-btn">圖片</button>
-                    <button onclick="switchTab('audio')" id="tab-audio" class="tab-btn">音訊</button>
-                </div>
-
-                <div id="optionsGrid" class="space-y-3 pt-2"></div>
-            </div>
+            <button id="dlLink" class="btn-download">
+                <i class="fas fa-download"></i>
+                下載影片
+            </button>
         </div>
-
-    </main>
-
-    <footer class="mt-auto py-10 text-center space-y-1">
-        <p class="text-[10px] text-slate-700 font-black tracking-[0.4em] uppercase">© 2026 DOWNLOADERX • BY GC</p>
-        <p class="text-[8px] text-slate-800">Backend: oliver2013tw-dwnx-back</p>
-    </footer>
+    </div>
 
     <script>
-        const API_URL = "https://oliver2013tw-dwnx-back.hf.space/api/analyze";
-        let resData = null;
+        // 對應你的 Hugging Face API 網址
+        const API_BASE = "https://oliver2013tw-dwnx-back.hf.space/api/analyze";
 
-        async function analyzeUrl() {
-            const val = document.getElementById('urlInput').value.trim();
-            if(!val) return;
+        async function analyze() {
+            const url = document.getElementById('urlInput').value.trim();
+            if (!url) return;
 
-            const loader = document.getElementById('loader');
-            const res = document.getElementById('resultSection');
-            const btnIcon = document.getElementById('btnIcon');
+            const icon = document.getElementById('btnIcon');
+            const resArea = document.getElementById('resultArea');
+            const thumb = document.getElementById('thumb');
 
-            loader.classList.remove('hidden');
-            res.classList.add('hidden');
-            btnIcon.className = "fas fa-circle-notch animate-spin";
+            // UI 狀態切換
+            icon.className = "fas fa-circle-notch loading-spin";
+            resArea.classList.add('hidden');
+            thumb.style.display = 'none';
 
             try {
-                const response = await fetch(`${API_URL}?url=${encodeURIComponent(val)}`);
+                const response = await fetch(`${API_BASE}?url=${encodeURIComponent(url)}`);
                 const data = await response.json();
 
-                if(data.success) {
-                    resData = data;
-                    document.getElementById('previewImg').src = data.thumbnail || "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800";
-                    document.getElementById('resTitle').innerText = data.title;
-                    document.getElementById('platformTag').innerText = data.platform;
-                    document.getElementById('playIcon').style.display = data.url ? 'flex' : 'none';
+                if (data.success) {
+                    document.getElementById('thumb').src = data.thumbnail;
+                    document.getElementById('videoTitle').innerText = data.title;
+                    document.getElementById('platform').innerText = data.platform || "MEDIA";
                     
-                    res.classList.remove('hidden');
-                    switchTab(data.images && data.images.length > 0 && !data.url ? 'image' : 'video');
+                    // 下載功能
+                    document.getElementById('dlLink').onclick = () => {
+                        window.open(data.download_url, '_blank');
+                    };
+
+                    resArea.classList.remove('hidden');
                 } else {
-                    alert("解析失敗：" + data.error);
+                    alert("解析失敗: " + data.error);
                 }
-            } catch(e) {
-                alert("伺服器連線失敗");
+            } catch (err) {
+                alert("無法連接到後端 API，請確認 Space 是否正在運行。");
             } finally {
-                loader.classList.add('hidden');
-                btnIcon.className = "fas fa-paper-plane";
+                icon.className = "fas fa-paper-plane";
             }
         }
 
-        async function forceDownload(url, filename) {
-            const btn = event.currentTarget;
-            const original = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner animate-spin"></i>';
-            
-            try {
-                const response = await fetch(url);
-                const blob = await response.blob();
-                const blobUrl = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = blobUrl;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(blobUrl);
-            } catch(e) {
-                window.open(url, '_blank');
-            } finally {
-                btn.innerHTML = original;
-            }
-        }
-
-        function switchTab(type) {
-            ['video', 'image', 'audio'].forEach(t => {
-                document.getElementById(`tab-${t}`).className = t === type ? 'tab-btn active' : 'tab-btn';
-            });
-
-            const grid = document.getElementById('optionsGrid');
-            grid.innerHTML = '';
-
-            if(type === 'video' && resData.url) {
-                grid.innerHTML = createDownloadItem("下載最佳畫質影片", resData.url, "video.mp4", "fa-video");
-            } else if(type === 'image' && resData.images) {
-                const imgGrid = document.createElement('div');
-                imgGrid.className = "grid grid-cols-2 gap-2";
-                resData.images.forEach((img, i) => {
-                    imgGrid.innerHTML += `
-                        <div class="relative group aspect-square rounded-lg overflow-hidden border border-white/10">
-                            <img src="${img}" class="w-full h-full object-cover">
-                            <button onclick="forceDownload('${img}', 'img_${i}.jpg')" class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                                <i class="fas fa-download text-white"></i>
-                            </button>
-                        </div>`;
-                });
-                grid.appendChild(imgGrid);
-            } else if(type === 'audio' && resData.url) {
-                grid.innerHTML = createDownloadItem("提取 MP3 音訊", resData.url, "audio.mp3", "fa-music");
-            }
-        }
-
-        function createDownloadItem(label, url, file, icon) {
-            return `
-                <div class="bg-white/5 p-4 rounded-xl flex justify-between items-center border border-white/5">
-                    <div class="flex items-center gap-3">
-                        <i class="fas ${icon} text-blue-400"></i>
-                        <span class="text-xs font-bold">${label}</span>
-                    </div>
-                    <button onclick="forceDownload('${url}', '${file}')" class="bg-blue-600 px-4 py-1.5 rounded-lg text-[10px] font-black uppercase">下載</button>
-                </div>`;
-        }
+        // 支援 Enter 鍵
+        document.getElementById('urlInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') analyze();
+        });
     </script>
 </body>
 </html>
